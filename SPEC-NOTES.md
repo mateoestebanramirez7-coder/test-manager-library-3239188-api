@@ -8,6 +8,7 @@ Spec de referencia: `test-manager-library-3239188-docs`, carpeta `spec-.net/`. S
 |---|---|
 | `SPEC-NOTES.md` | Este archivo: traducción, supuestos, trazabilidad y estado con evidencia |
 | `plan.md` | Plan técnico del spec .NET traducido a Laravel y React (D-01 a D-14) |
+| `tasks.md` | Tareas T-01 a T-23 adaptadas a Laravel y React, con evidencia y estado |
 | `adr/adr-005-jwt-en-lugar-de-sanctum.md` | Por qué el token es JWT y no Sanctum |
 | `adr/adr-006-concurrencia-con-actualizacion-condicionada.md` | Cómo se cumple RNF-2 sin la columna de versión |
 | `adr/adr-007-arquitectura-en-capas-simples.md` | Por qué no se aplica hexagonal estricta |
@@ -40,4 +41,20 @@ Los ADR 001 a 004 son los del spec original y se respetan tal cual. La numeraci�
 
 ## 3. Supuestos y desviaciones
 
-1. **Concurrencia (ADR-002 vs `data-model.md`).** El ADR habla de un "testigo de versión", pero el modelo de datos no lista esa columna en `book`. Como el modelo gana (artículo X), no agrego columna. Cumplo RNF-2 con una actualización condicionada a que queden ejemplares disponibles dentro de la transacción del préstamo; si no afecta ninguna fila, respondo 409 `BOOK_NOT_AVAILABLE`. El CHECK
+1. **Concurrencia (ADR-002 vs `data-model.md`).** El ADR habla de un "testigo de versión", pero el modelo de datos no lista esa columna en `book`. Como el modelo gana (artículo X), no agrego columna. Cumplo RNF-2 con una actualización condicionada a que queden ejemplares disponibles dentro de la transacción del préstamo; si no afecta ninguna fila, respondo 409 `BOOK_NOT_AVAILABLE`. El CHECK `ck_book_available_range` queda como última barrera. Decisión formalizada en el ADR-006.
+2. **Arquitectura.** No implemento hexagonal estricta ni pruebas de arquitectura (artículos I a III, T-19). Dejo capas simples: controladores → servicios → modelos. Las reglas de negocio viven en servicios y modelos, no en controladores. Decisión formalizada en el ADR-007.
+3. **Autenticación.** Uso JWT y no Sanctum, porque el contrato exige un token firmado de 8 horas con `sub` y `role`. Decisión formalizada en el ADR-005.
+4. **Orden de validaciones al prestar** (el spec no lo fija): socio con vencidos (409) → límite de 3 sin devolver contando todos los préstamos (422, con el conteo actual) → libro repetido (422) → ejemplares (409). Un fallo no registra nada.
+5. **CHECK de T-18** (`ck_book_total_positive`, `ck_user_role`): se incluyen directamente en la migración inicial, porque en Laravel cuesta lo mismo.
+6. **Rango del reporte.** `from` y `to` son fechas inclusivas en UTC: desde las 00:00 de `from` hasta el final del día de `to`.
+7. **Vencida** = línea sin devolver con `due_at` menor que ahora. Los días de retraso se calculan en la consulta.
+8. **Timestamps de Eloquent desactivados**: el modelo no tiene `created_at`/`updated_at`. Los UUID los genera la aplicación.
+9. **Portadas** en disco local (`COVERS_DIR`); la base guarda solo `cover_key`.
+10. **Numeración de tareas.** `tasks.md` conserva T-01 a T-23 del spec original para mantener la trazabilidad con las historias; la ruta crítica y la prioridad están en su sección 3.
+
+## 4. Trazabilidad
+
+| HU | Endpoints | Criterios clave | Tarea |
+|---|---|---|---|
+| HU-01 Login | `POST /auth/login`, `GET /health` | 401 sin revelar qué falló; token 8 h; 401/403 | T-01, T-14, T-16 |
+| HU-02 Bibliotecarios | `POST /users` | minúsculas y recorte; 409 repetido; rol `admin` → 422 | T-07,
