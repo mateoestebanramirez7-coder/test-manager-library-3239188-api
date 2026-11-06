@@ -14,6 +14,7 @@ Spec de referencia: `test-manager-library-3239188-docs`, carpeta `spec-.net/`. S
 | `adr/adr-005-jwt-en-lugar-de-sanctum.md` | Por qué el token es JWT y no Sanctum |
 | `adr/adr-006-concurrencia-con-actualizacion-condicionada.md` | Cómo se cumple RNF-2 sin la columna de versión |
 | `adr/adr-007-arquitectura-en-capas-simples.md` | Por qué no se aplica hexagonal estricta |
+| `spec-laravel-react/README.md` (repo `docs`) | Índice que enlaza estos documentos desde el repo del spec |
 
 Los ADR 001 a 004 son los del spec original y se respetan tal cual. La numeración de los propios continúa desde el 005.
 
@@ -109,6 +110,6 @@ Se marca cada tarea solo cuando existe su evidencia (artículo XII). Hasta ahora
 | R-4 | No se define qué hace la API con `size` mayor que 50 | Supuesto 11: se limita a 50 |
 | R-5 | `data-model.md` marca dos CHECK como pendientes de T-18 | Supuesto 5: se adelantan a la migración inicial; habría que actualizar §4 del modelo de datos al implementar |
 | R-6 | El reporte puede mostrar un mismo libro en dos filas | Es el comportamiento correcto según ADR-004 y CA-10.1; el frontend debe aceptarlo |
-| R-7 | Solo se leyó `spec-.net/`; `spec-python/` no se revisó | El README del repo `docs` confirma que ambos describen el mismo producto; si hay una duda de negocio, se consulta el otro |
+| R-7 | Solo se leyó `spec-.net/`; `spec-python/` no se revisó | El README del repo `docs` confirma que ambos describen el mismo producto; si hay una duda de negocio, se consulta el otro. La carpeta `spec-.net/` no se modificó: la traducción vive en este repo y el repo `docs` solo recibe un índice (`spec-laravel-react/`) |
 | R-8 | La ruta de vencidos puede confundirse con la de detalle de préstamo | Registrar `/loans/overdue` antes que `/loans/{id}`; hay un caso en `test-cases.md` |
 | R-9 | Sin código, ninguna evidencia ejecutable existe todavía | Cada tarea queda pendiente, con su evidencia esperada en `tasks.md` y `test-cases.md` |
